@@ -1,5 +1,5 @@
-#ifndef HDR_ISTATEMANAGER_H
-#define HDR_ISTATEMANAGER_H
+#ifndef HDR_ISTATECONTEXT_H
+#define HDR_ISTATECONTEXT_H
 
 #include <Arduino.h>
 

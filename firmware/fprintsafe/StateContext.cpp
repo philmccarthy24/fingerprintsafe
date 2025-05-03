@@ -1,9 +1,9 @@
-#include "LockManagerContext.h"
+#include "StateContext.h"
 #include "IStatusLed.h"
 #include "ILock.h"
 #include <EEPROM.h>
 
-LockManagerContext::LockManagerContext(ILock* pLock, IStatusLed* pStatusLed) :
+StateContext::StateContext(ILock* pLock, IStatusLed* pStatusLed) :
 m_unlockedState(this, pLock, pStatusLed),
 m_lockedState(this, pLock, pStatusLed),
 m_changePinState(this, pStatusLed),
@@ -11,11 +11,11 @@ m_pLock(pLock)
 {
 }
 
-LockManagerContext::~LockManagerContext()
+StateContext::~StateContext()
 {
 }
 
-void LockManagerContext::Initialise()
+void StateContext::Initialise()
 {
   if (m_pLock->IsLocked())
   {
@@ -43,22 +43,12 @@ void LockManagerContext::Initialise()
   }
 }
 
-void LockManagerContext::OnStateChanged()
+void StateContext::OnStateChanged()
 {
   // should never be called on main context
 }
 
-void LockManagerContext::HandleKeypress(char k)
-{
-  m_pCurrentState->HandleKeypress(k);
-}
-
-void LockManagerContext::CheckTimeout()
-{
-  m_pCurrentState->CheckTimeout();
-}
-
-void LockManagerContext::UpdateState(ELockState newState)
+void StateContext::UpdateState(EDeviceState newState)
 {
   switch (newState) {
     case Unlocked :

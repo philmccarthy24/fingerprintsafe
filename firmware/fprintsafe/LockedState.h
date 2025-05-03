@@ -1,14 +1,20 @@
 #ifndef HDR_LOCKEDSTATE_H
 #define HDR_LOCKEDSTATE_H
 
-#include "ILockManager.h"
+#include "IStateContext.h"
 
 // forward decs
 class ILock;
 class IStatusLed;
 class ILockManagerContext;
 
-class LockedState : public ILockManagerState
+class WvFingerprint;
+class MicroSwitch;
+class MomentarySwitch;
+class PiezoBuzzer;
+class Solenoid;
+
+class LockedState : public IDeviceState
 {
 public:
   LockedState(ILockManagerContext* pContext, ILock* pLock, IStatusLed* pStatusLed);

@@ -43,6 +43,9 @@
 #define WVFP_TXRXBUFFER_SIZE       8
 #define WVFP_TXRXDATA_SIZE         4
 
+// Represents a WaveShare UART figerprint reader. Adapted from code here https://github.com/lbuchs/wv-uart-fingerprint.
+// Thanks to Lukas Buchs for doing the heavy lifting, I just had to correct a few bugs and tweak delays for back-from-sleep mode.
+// I've left out the eigenvalue stuff as I didn't need it
 class WvFingerprint {
 
     public:
@@ -58,17 +61,15 @@ class WvFingerprint {
         bool addUser(uint16_t userId, uint8_t step);
         uint16_t checkForFingerprint();
         uint8_t getLastError();
-        //void setAlwaysAwake(bool value);
 
     private:
         HardwareSerial * _serial;
-        byte _cmdSendBuffer[WVFP_TXRXBUFFER_SIZE]; // Senden-Buffer
-        byte _cmdReceiverBuffer[WVFP_TXRXBUFFER_SIZE]; // Empfangen-Buffer
+        byte _cmdSendBuffer[WVFP_TXRXBUFFER_SIZE];
+        byte _cmdReceiverBuffer[WVFP_TXRXBUFFER_SIZE];
         uint8_t _rstPin;
         uint8_t _wakePin;
         uint8_t _lastError;
-        uint8_t _timeout; // timeout in sekunden (0-255)
-        //bool _alwaysAwake;
+        uint8_t _timeout; // timeout in seconds (0-255)
 
         bool _waitingForFp;
         void _clearTxBuffer();

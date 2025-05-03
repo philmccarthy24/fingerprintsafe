@@ -6,6 +6,10 @@ PiezoBuzzer::PiezoBuzzer(uint8_t buzzerPin) :
 {
 }
 
+PiezoBuzzer::~PiezoBuzzer()
+{
+}
+
 void PiezoBuzzer::Init()
 {
     pinMode(m_buzzerPin, OUTPUT);
