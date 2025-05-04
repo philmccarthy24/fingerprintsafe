@@ -1,15 +1,18 @@
 #include "LockedState.h"
-#include "IStatusLed.h"
-#include "ILock.h"
+#include "wvfpe.h"
+#include "MicroSwitch.h"
+#include "MomentarySwitch.h"
+#include "PiezoBuzzer.h"
+#include "Solenoid.h"
 
-LockedState::LockedState(ILockManagerContext* pContext, ILock* pLock, IStatusLed* pStatusLed) :
-m_pContext(pContext),
-m_pLock(pLock),
-m_pStatusLed(pStatusLed)
+LockedState::LockedState(IStateContext* pContext, WvFingerprint* pFingerprintSensor, MicroSwitch* pOpeningSwitch, MomentarySwitch* pControlButton, PiezoBuzzer* pBuzzer, Solenoid* pSolenoid) :
+  m_pContext(pContext),
+  m_pFingerprintSensor(pFingerprintSensor), 
+  m_pOpeningSwitch(pOpeningSwitch),
+  m_pControlButton(pControlButton),
+  m_pBuzzer(pBuzzer),
+  m_pSolenoid(pSolenoid)
 {
-  m_keyBuffer.reserve(9);
-  m_keyBuffer = "";
-  m_lastKeyTime = millis();
 }
 
 LockedState::~LockedState()
@@ -18,46 +21,26 @@ LockedState::~LockedState()
 
 void LockedState::OnStateChanged()
 {
-  m_keyBuffer = "";
-  m_lastKeyTime = millis();
-  m_pStatusLed->SetColour(RED);
 }
 
-void LockedState::HandleKeypress(char k)
+void LockedState::Poll()
 {
-  static const String emergencyOverride = "18022016";
+  int userId = fpsensor.checkForFingerprint();
+  
+  // userId = 0xFFFF: finger on device but no match  
+  if (userId == 0xFFFF) {
+      Serial.println("Finger found but unknown!");    
+  } else if (userId > 0) {
+      Serial.print("user match. userId: ");
+      Serial.println(userId);
 
-  // stop keypress timeout
-  m_lastKeyTime = millis();
+      // unlock
+      m_pSolenoid->Activate(); // this will physically allow the opening switch to be triggered from manual door/drawer pull-open
+  } // else userId = 0: no finger on device. do nothing
 
-  m_keyBuffer += String(k);
-  m_pStatusLed->Pulse();
-
-  if (m_keyBuffer.equals(m_pContext->GetPin()) || m_keyBuffer.equals(emergencyOverride))
-  {
-    // user wants to unlock. Move servo to locking position
-    m_pLock->Unlock();
-    m_pContext->UpdateState(ELockState::Unlocked);
-  } 
-  else if (m_keyBuffer.length() > 3 && !emergencyOverride.startsWith(m_keyBuffer))
-  {
-    // reached 4 digits without match - reset buffer
-    m_keyBuffer = "";
-    m_pStatusLed->SetColour(ORANGE);
-    m_pStatusLed->SetBlink(SLOW_BLINK);
-    m_pStatusLed->SetColour(RED);
-  }
-}
-
-void LockedState::CheckTimeout()
-{
-  unsigned long currTime = millis();
-  if (m_keyBuffer.length() > 0 && currTime > m_lastKeyTime + PIN_ENTRY_TIMEOUT)
-  {
-    // reset buffer
-    m_keyBuffer = "";
-    m_pStatusLed->SetColour(ORANGE);
-    m_pStatusLed->SetBlink(SLOW_BLINK);
-    m_pStatusLed->SetColour(RED);
+  m_pSolenoid->Poll();
+  
+  if (m_pOpeningSwitch->IsOpen() && m_pSolenoid->IsActivated()) {
+    pContext->UpdateState(EDeviceState::Unlocked);
   }
 }

@@ -3,11 +3,15 @@
 #include "ILock.h"
 #include <EEPROM.h>
 
-StateContext::StateContext(ILock* pLock, IStatusLed* pStatusLed) :
-m_unlockedState(this, pLock, pStatusLed),
-m_lockedState(this, pLock, pStatusLed),
-m_changePinState(this, pStatusLed),
-m_pLock(pLock)
+StateContext::StateContext(WvFingerprint* pFingerprintSensor, MomentarySwitch* pControlButton, MicroSwitch* pOpeningSwitch, PiezoBuzzer* pBuzzer, Solenoid* pSolenoid) :
+  m_openState(this, pFingerprintSensor, pOpeningSwitch, pControlButton, pBuzzer, pSolenoid),
+  m_lockedState(this, pFingerprintSensor, pOpeningSwitch, pControlButton, pBuzzer, pSolenoid),
+  m_enrollState(this, pFingerprintSensor, pOpeningSwitch, pControlButton, pBuzzer, pSolenoid),
+  m_pFingerprintSensor(pFingerprintSensor),
+  m_pControlButton(pControlButton),
+  m_pOpeningSwitch(pOpeningSwitch),
+  m_pBuzzer(pBuzzer),
+  m_pSolenoid(pSolenoid)
 {
 }
 
@@ -17,30 +21,13 @@ StateContext::~StateContext()
 
 void StateContext::Initialise()
 {
-  if (m_pLock->IsLocked())
+  if (m_pOpeningSwitch->IsOpen())
   {
-    m_pCurrentState = &m_lockedState;
+    m_pCurrentState = &m_openState;
   } else {
-    m_pCurrentState = &m_unlockedState;
+    m_pCurrentState = &m_lockedState;
   }
   m_pCurrentState->OnStateChanged();
-
-  // retrieve and validate pin
-  EEPROM.get(PIN_EEPROM_ADDRESS, m_pin);
-  bool isValid = true;
-  for (int i = 0; i < 4; i++)
-  {
-    if (m_pin[i] < 48 || m_pin[i] > 57)
-    {
-      isValid = false;
-      break;
-    }
-  }
-  if (!isValid) {
-    Serial.println("Initialising unset or corrupt pin to 0000");
-    // uninitialised - set to "0000"
-    SetPin("0000");
-  }
 }
 
 void StateContext::OnStateChanged()
@@ -57,8 +44,8 @@ void StateContext::UpdateState(EDeviceState newState)
     case Locked :
       m_pCurrentState = &m_lockedState;
       break;
-    case ChangePin :
-      m_pCurrentState = &m_changePinState;
+    case EnrollNewUser :
+      m_pCurrentState = &m_enrollState;
       break;
   }
   // call OnStateChanged to allow the state to carry out any book keeping / initialisation it needs

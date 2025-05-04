@@ -34,7 +34,7 @@ ActionType MicroSwitch::PollForChange()
     return result;
 }
 
-ActionType MicroSwitch::GetCurrentState()
+ActionType MicroSwitch::IsOpen()
 {
-    return digitalRead(m_buttonPin) == LOW ? ActionType::Closed : ActionType::Open;
+    return digitalRead(m_buttonPin) == HIGH;
 }

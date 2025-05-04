@@ -1,24 +1,20 @@
-#ifndef HDR_LOCKEDSTATE_H
-#define HDR_LOCKEDSTATE_H
+#ifndef HDR_ENROLLSTATE_H
+#define HDR_ENROLLSTATE_H
 
 #include "IStateContext.h"
 
 // forward decs
-class ILock;
-class IStatusLed;
-class ILockManagerContext;
-
 class WvFingerprint;
 class MicroSwitch;
 class MomentarySwitch;
 class PiezoBuzzer;
 class Solenoid;
 
-class LockedState : public IDeviceState
+class EnrollState : public IDeviceState
 {
 public:
-  LockedState(IStateContext* pContext, WvFingerprint* pFingerprintSensor, MicroSwitch* pOpeningSwitch, MomentarySwitch* pControlButton, PiezoBuzzer* pBuzzer, Solenoid* pSolenoid);
-  virtual ~LockedState();
+  EnrollState(IStateContext* pContext, WvFingerprint* pFingerprintSensor, MicroSwitch* pOpeningSwitch, MomentarySwitch* pControlButton, PiezoBuzzer* pBuzzer, Solenoid* pSolenoid);
+  virtual ~EnrollState();
 
   virtual void OnStateChanged();
   virtual void Poll();

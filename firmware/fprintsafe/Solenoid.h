@@ -9,12 +9,14 @@ public:
 
   void Init();
   void Activate();
+  void IsActivated();
   void Poll();
 
 private:
   uint8_t m_controlPin;
   long m_activationDurationMS;
   long m_lastActivationTimeStamp;
+  bool m_bActivated;
 };
 
 #endif

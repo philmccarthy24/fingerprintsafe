@@ -2,18 +2,23 @@
 #define HDR_STATECONTEXT_H
 
 #include "IStateContext.h"
-#include "UnlockedState.h"
+#include "OpenState.h"
 #include "LockedState.h"
-
+#include "EnrollState.h"
 
 // forward decs
-class ILock;
-class IStatusLed;
+class WvFingerprint;
+class MomentarySwitch;
+class MicroSwitch;
+class PiezoBuzzer;
+class Solenoid;
 
+// it would be nice to house the low level device abstractions in this class so it's more self
+// contained and ownership isn't bled into the main sketch... but might not be possible
 class StateContext : public IDeviceState, IStateContext
 {
 public:
-  StateContext(ILock* pLock, IStatusLed* pStatusLed);
+  StateContext(WvFingerprint* pFingerprintSensor, MomentarySwitch* pControlButton, MicroSwitch* pOpeningSwitch, PiezoBuzzer* pBuzzer, Solenoid* pSolenoid);
   virtual ~StateContext();
 
   void Initialise();
@@ -24,12 +29,17 @@ public:
   virtual void UpdateState(EDeviceState newState);
 
 private:
-  UnlockedState m_unlockedState;
+  OpenState m_openState;
   LockedState m_lockedState;
-  ChangePinState m_changePinState;
+  EnrollState m_enrollState;
 
-  ILock* m_pLock;
-  ILockManagerState* m_pCurrentState;
+  IDeviceState* m_pCurrentState;
+
+  WvFingerprint* m_pFingerprintSensor;
+  MomentarySwitch* m_pControlButton;
+  MicroSwitch* m_pOpeningSwitch;
+  PiezoBuzzer* m_pBuzzer;
+  Solenoid* m_pSolenoid;
 };
 
 #endif

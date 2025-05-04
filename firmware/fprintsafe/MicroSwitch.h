@@ -16,7 +16,7 @@ class MicroSwitch {
         virtual ~MicroSwitch();
         void Init();
         ActionType PollForChange();
-        ActionType GetCurrentState();
+        bool IsOpen();
 
     private:
         uint8_t m_buttonPin;
