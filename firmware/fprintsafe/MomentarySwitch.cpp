@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "button.h"
+#include "MomentarySwitch.h"
 
 MomentarySwitch::MomentarySwitch(uint8_t buttonPin, long longPressMS) :
     m_buttonPin(buttonPin),

@@ -26,6 +26,9 @@ private:
   MomentarySwitch* m_pControlButton;
   PiezoBuzzer* m_pBuzzer;
   Solenoid* m_pSolenoid;
+  long m_enrollStartTimestamp;
+
+  static const long ENROLL_STATE_TIMEOUT_MS = 10000;
 };
 
 #endif

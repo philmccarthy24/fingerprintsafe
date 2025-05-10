@@ -20,6 +20,7 @@ void Solenoid::Init()
 
 void Solenoid::Activate()
 {
+    Serial.println("Solenoid activated");
     digitalWrite(m_controlPin, HIGH);
     m_lastActivationTimeStamp = millis();
     m_bActivated = true;
@@ -36,5 +37,6 @@ void Solenoid::Poll()
     {
         digitalWrite(m_controlPin, LOW);
         m_bActivated = false;
+        Serial.println("Solenoid deactivated");
     }
 }

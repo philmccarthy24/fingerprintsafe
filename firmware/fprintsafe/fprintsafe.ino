@@ -38,14 +38,6 @@ void setup() {
 }
 
 void loop() {
-
-  
-  else 
-  {
-
-    
-    
-  }
-
+  stateMachine.Poll();
 }
 

@@ -1,7 +1,9 @@
 #include "StateContext.h"
-#include "IStatusLed.h"
-#include "ILock.h"
-#include <EEPROM.h>
+#include "wvfpe.h"
+#include "MicroSwitch.h"
+#include "MomentarySwitch.h"
+#include "PiezoBuzzer.h"
+#include "Solenoid.h"
 
 StateContext::StateContext(WvFingerprint* pFingerprintSensor, MomentarySwitch* pControlButton, MicroSwitch* pOpeningSwitch, PiezoBuzzer* pBuzzer, Solenoid* pSolenoid) :
   m_openState(this, pFingerprintSensor, pOpeningSwitch, pControlButton, pBuzzer, pSolenoid),
@@ -39,7 +41,7 @@ void StateContext::UpdateState(EDeviceState newState)
 {
   switch (newState) {
     case Unlocked :
-      m_pCurrentState = &m_unlockedState;
+      m_pCurrentState = &m_openState;
       break;
     case Locked :
       m_pCurrentState = &m_lockedState;
@@ -52,3 +54,8 @@ void StateContext::UpdateState(EDeviceState newState)
   m_pCurrentState->OnStateChanged();
 }
 
+void StateContext::Poll()
+{
+  m_pSolenoid->Poll();
+  m_pCurrentState->Poll();
+}

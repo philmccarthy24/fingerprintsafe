@@ -21,11 +21,12 @@ LockedState::~LockedState()
 
 void LockedState::OnStateChanged()
 {
+  Serial.println("LockedState entry");
 }
 
 void LockedState::Poll()
 {
-  int userId = fpsensor.checkForFingerprint();
+  int userId = m_pFingerprintSensor->checkForFingerprint();
   
   // userId = 0xFFFF: finger on device but no match  
   if (userId == 0xFFFF) {
@@ -38,9 +39,9 @@ void LockedState::Poll()
       m_pSolenoid->Activate(); // this will physically allow the opening switch to be triggered from manual door/drawer pull-open
   } // else userId = 0: no finger on device. do nothing
 
-  m_pSolenoid->Poll();
+  // NOTE solenoid is polled in context
   
   if (m_pOpeningSwitch->IsOpen() && m_pSolenoid->IsActivated()) {
-    pContext->UpdateState(EDeviceState::Unlocked);
+    m_pContext->UpdateState(EDeviceState::Unlocked);
   }
 }

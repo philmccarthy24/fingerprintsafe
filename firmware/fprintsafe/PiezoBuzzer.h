@@ -8,8 +8,9 @@
 class PiezoBuzzer {
     public:
         PiezoBuzzer(uint8_t buzzerPin);
+        virtual ~PiezoBuzzer();
         void Init();
-        void PlayPress();
+        void PlayReady();
         void PlaySuccess();
         void PlayError();
         void PlayReset();

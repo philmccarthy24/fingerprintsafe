@@ -9,7 +9,7 @@ public:
 
   void Init();
   void Activate();
-  void IsActivated();
+  bool IsActivated();
   void Poll();
 
 private:

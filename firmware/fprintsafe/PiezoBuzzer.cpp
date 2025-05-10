@@ -26,8 +26,16 @@ void PiezoBuzzer::PlaySuccess()
     noTone(m_buzzerPin);
 }
 
-void PiezoBuzzer::PlayPress()
+void PiezoBuzzer::PlayReady()
 {
+    tone(m_buzzerPin, 28);  // A0
+    delay(20);
+    noTone(m_buzzerPin);
+    delay(100);
+    tone(m_buzzerPin, 28);  // A0
+    delay(20);
+    noTone(m_buzzerPin);
+    delay(100);
     tone(m_buzzerPin, 28);  // A0
     delay(20);
     noTone(m_buzzerPin);

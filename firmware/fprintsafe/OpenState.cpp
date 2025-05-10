@@ -22,49 +22,25 @@ OpenState::~OpenState()
 
 void OpenState::OnStateChanged()
 {
-
+  Serial.println("OpenState entry");
 }
 
 void OpenState::Poll()
 {
-  m_pSolenoid->Poll();
+  ActionType as = m_pControlButton->PollForAction();
 
-ActionType as = ms.PollForAction();
-
-//////// TODO still going
-
-  if (as == ActionType::ShortPress) {
-    piezo.PlayPress();
-    Serial.println("Enrolling new user. Place your finger on the sensor.");
-
-    int16_t numUsers = fpsensor.getUserCount();
-    Serial.print("Num users = ");
-    Serial.println(numUsers);
-    
-    delay(3000);
-    
-    bool addResult = false;
-    for (int i = 1; i < 4; i++) {
-      addResult = fpsensor.addUser(numUsers+1, i);
-      if (!addResult) {
-        Serial.print("Add step ");
-        Serial.print(i);
-        Serial.println(" failed");
-        piezo.PlayError();
-        return;
-      }
-      Serial.print("Remove your finger then place it back on the sensor.");
-    }
-    
-    piezo.PlaySuccess();
-    Serial.print("User id ");
-    Serial.print(numUsers+1);
-    Serial.println(" added.");
-    
+  if (as == ActionType::Pushed) {
+    Serial.println("Enrolling new user. Place your finger on the sensor and press the button again.");
+    m_pContext->UpdateState(EDeviceState::EnrollNewUser);
   }
-  else if (as == ActionType::LongPress) {
-    fpsensor.clearAllUser();
-    piezo.PlayReset();
+  else if (as == ActionType::HeldDown) {
+    m_pFingerprintSensor->clearAllUser();
+    m_pBuzzer->PlayReset();
     Serial.println("All users removed from fingerprint scanner.");
+  }
+  
+  if (!m_pOpeningSwitch->IsOpen())
+  {
+    m_pContext->UpdateState(EDeviceState::Locked);
   }
 }
